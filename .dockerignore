@@ -1,0 +1,10 @@
+.dockerignore
+Dockerfile
+.git/
+.gitignore
+.gitlab-ci.yml
+*.md
+npm-debug.log
+.vscode
+.idea
+node_modules
