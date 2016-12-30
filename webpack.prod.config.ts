@@ -5,7 +5,7 @@ const webpackMerge = require('webpack-merge');
 const V8LazyParseWebpackPlugin = require('v8-lazy-parse-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 import webpackConfig, { root,  includeClientPackages } from './webpack.config';
-// const CompressionPlugin = require('compression-webpack-plugin');
+const CompressionPlugin = require('compression-webpack-plugin');
 
 
 export const commonPlugins = [
@@ -65,13 +65,13 @@ export const clientPlugins = [
   // add 'var CompressionPlugin = require("compression-webpack-plugin");' on the top
   // and comment out below codes
   //
-  // new CompressionPlugin({
-  //   asset: "[path].gz[query]",
-  //   algorithm: "gzip",
-  //   test: /\.js$|\.css$|\.html$/,
-  //   threshold: 10240,
-  //   minRatio: 0.8
-  // }),
+  new CompressionPlugin({
+    asset: "[path].gz[query]",
+    algorithm: "gzip",
+    test: /\.js$|\.css$|\.html$/,
+    threshold: 10240,
+    minRatio: 0.8
+  }),
 
   new webpack.optimize.UglifyJsPlugin({
     // beautify: true,
