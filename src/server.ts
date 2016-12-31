@@ -7,7 +7,7 @@ import 'ts-helpers';
 import './__workaround.node'; // temporary until 2.1.1 things are patched in Core
 
 import * as morgan from 'morgan';
-import app from './server.common';
+
 // Angular 2 Universal
 import { createEngine } from 'angular2-express-engine';
 
@@ -16,6 +16,8 @@ import { MainModule } from './node.module';
 
 // Routes
 import { routes } from './server.routes';
+
+import app from './server.common';
 
 // Express View
 app.engine('.html', createEngine({
