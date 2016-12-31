@@ -1,5 +1,5 @@
 # Fenix
-[![Build Status](https://semaphoreci.com/api/v1/yanwsh/fenix/branches/master/shields_badge.svg)](https://semaphoreci.com/yanwsh/fenix) [![Heroku](https://heroku-badge.herokuapp.com/?app=fenix)]
+[![Build Status](https://semaphoreci.com/api/v1/yanwsh/fenix/branches/master/shields_badge.svg)](https://semaphoreci.com/yanwsh/fenix) [![Heroku](https://heroku-badge.herokuapp.com/?app=fenix&style=flat&svg=1)](https://lit-gorge-13645.herokuapp.com/)
 > Server-Side Rendering for Angular 2
 
 ## Installation
