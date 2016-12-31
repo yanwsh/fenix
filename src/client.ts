@@ -4,14 +4,10 @@ import 'ts-helpers';
 import './__workaround.browser'; // temporary until 2.1.1 things are patched in Core
 
 // Angular 2
-import { enableProdMode } from '@angular/core';
 import { platformUniversalDynamic } from 'angular2-universal/browser';
 import { bootloader } from '@angularclass/bootloader';
 
 import { load as loadWebFont } from 'webfontloader';
-
-// enable prod for faster renders
-// enableProdMode();
 
 import { MainModule } from './browser.module';
 

@@ -4,7 +4,7 @@ import * as bodyParser from 'body-parser';
 import * as cookieParser from 'cookie-parser';
 
 import * as mcache from 'memory-cache';
-const { gzipSync } = require('zlib');
+const { gzipSync, deflateSync } = require('zlib');
 const accepts = require('accepts');
 const { compressSync } = require('iltorb');
 const interceptor = require('express-interceptor');
@@ -28,34 +28,46 @@ app.use(bodyParser.json());
 
 app.use(interceptor((req, res)=>({
     // don't compress responses with this request header
-    isInterceptable: () => (!req.headers['x-no-compression']),
+    isInterceptable: () => {
+        // Don't compress for Cache-Control: no-transform
+        // https://tools.ietf.org/html/rfc7234#section-5.2.2.4
+        const cacheControlNoTransformRegExp = /(?:^|,)\s*?no-transform\s*?(?:,|$)/;
+        var cacheControl = res.getHeader('Cache-Control');
+        return !cacheControl ||
+            !cacheControlNoTransformRegExp.test(cacheControl) ||
+            !req.headers['x-no-compression']
+    },
     intercept: ( body, send ) => {
         const encodings  = new Set(accepts(req).encodings());
         const bodyBuffer = new Buffer(body);
+
         // url specific key for response cache
         const key = '__response__' + req.originalUrl || req.url;
         let output = bodyBuffer;
-        // check if cache exists
-        if (mcache.get(key) === null) {
-            // check for encoding support
-            if (encodings.has('br')) {
-                // brotli
-                res.setHeader('Content-Encoding', 'br');
+
+        const encoding = res.getHeader('Content-Encoding') || 'identity';
+        const contentType = res.getHeader('Content-Type') || "";
+
+        if(encoding !== 'identity'){
+            //already encoded.
+            send(output);
+            return;
+        }
+
+        if(encodings.has('br') && !contentType.includes("text/html") && !contentType.includes("application/json")){
+            res.setHeader('Content-Encoding', 'br');
+            if(mcache.get(key) == null){
                 output = compressSync(bodyBuffer);
-                mcache.put(key, {output, encoding: 'br'});
-            } else if (encodings.has('gzip')) {
-                // gzip
-                res.setHeader('Content-Encoding', 'gzip');
-                output = gzipSync(bodyBuffer);
-                mcache.put(key, {output, encoding: 'gzip'});
+                mcache.put(key, output);
+            }else{
+                output = mcache.get(key);
             }
-        } else {
-            const { output, encoding } = mcache.get(key);
-            if(encodings.has(encoding)){
-                res.setHeader('Content-Encoding', encoding);
-                send(output);
-                return;
-            }
+        }else if(encodings.has('gzip')){
+            res.setHeader('Content-Encoding', 'gzip');
+            output = gzipSync(bodyBuffer);
+        }else if(encodings.has('deflate')){
+            res.setHeader('Content-Encoding', 'deflate');
+            output = deflateSync(bodyBuffer);
         }
         send(output);
     }
